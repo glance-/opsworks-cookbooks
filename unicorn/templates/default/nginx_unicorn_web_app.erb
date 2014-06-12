@@ -50,6 +50,19 @@ server {
     deny all;
   }
 
+  <% if true -%>
+  location ~ ^/assets/ {
+    expires 1y;
+    add_header cache-control public;
+
+    gzip_static on; # to serve pre-gzipped version
+
+    # If you don't find the filename in the static files
+    # Then request it from the unicorn server
+    try_files $uri @unicorn;
+  }
+  <% end -%>
+
   error_page 500 502 503 504 /500.html;
   location = /500.html {
     root <%= @application[:absolute_document_root] %>;
@@ -98,6 +111,19 @@ server {
 
     proxy_pass http://unicorn_<%= @application[:domains].first %>;
   }
+
+  <% if true -%>
+  location ~ ^/assets/ {
+    expires 1y;
+    add_header cache-control public;
+
+    gzip_static on; # to serve pre-gzipped version
+
+    # If you don't find the filename in the static files
+    # Then request it from the unicorn server
+    try_files $uri @unicorn;
+  }
+  <% end -%>
 
   error_page 500 502 503 504 /500.html;
   location = /500.html {

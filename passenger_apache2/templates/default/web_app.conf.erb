@@ -33,6 +33,28 @@
     Deny from all
   </Directory>
 
+  <% if true -%>
+  <LocationMatch "^/assets/.*$">
+    # RFC says only cache for 1 year
+    ExpiresActive On
+    ExpiresDefault "access plus 1 year"
+
+    #Serve gzip compressed CSS files if they exist and the client accepts gzip.
+    RewriteCond %{HTTP:Accept-encoding} gzip
+    RewriteCond %{REQUEST_FILENAME}\.gz -s
+    RewriteRule ^(.*)\.css $1\.css\.gz [QSA]
+
+    # Serve gzip compressed JS files if they exist and the client accepts gzip.
+    RewriteCond %{HTTP:Accept-encoding} gzip
+    RewriteCond %{REQUEST_FILENAME}\.gz -s
+    RewriteRule ^(.*)\.js $1\.js\.gz [QSA]
+
+    # Serve correct content types, and prevent mod_deflate double gzip.
+    RewriteRule \.css\.gz$ - [T=text/css,E=no-gzip:1]
+    RewriteRule \.js\.gz$ - [T=text/javascript,E=no-gzip:1]
+  </LocationMatch>
+  <% end -%>
+
   LogLevel <%= node[:apache][:log_level] %>
   ErrorLog <%= node[:apache][:log_dir] %>/<%= @params[:name] %>-error.log
   CustomLog <%= node[:apache][:log_dir] %>/<%= @params[:name] %>-access.log combined
@@ -103,6 +125,28 @@
     Order allow,deny
     Deny from all
   </Directory>
+
+  <% if true -%>
+  <LocationMatch "^/assets/.*$">
+    # RFC says only cache for 1 year
+    ExpiresActive On
+    ExpiresDefault "access plus 1 year"
+
+    #Serve gzip compressed CSS files if they exist and the client accepts gzip.
+    RewriteCond %{HTTP:Accept-encoding} gzip
+    RewriteCond %{REQUEST_FILENAME}\.gz -s
+    RewriteRule ^(.*)\.css $1\.css\.gz [QSA]
+
+    # Serve gzip compressed JS files if they exist and the client accepts gzip.
+    RewriteCond %{HTTP:Accept-encoding} gzip
+    RewriteCond %{REQUEST_FILENAME}\.gz -s
+    RewriteRule ^(.*)\.js $1\.js\.gz [QSA]
+
+    # Serve correct content types, and prevent mod_deflate double gzip.
+    RewriteRule \.css\.gz$ - [T=text/css,E=no-gzip:1]
+    RewriteRule \.js\.gz$ - [T=text/javascript,E=no-gzip:1]
+  </LocationMatch>
+  <% end -%>
 
   LogLevel <%= node[:apache][:log_level] %>
   ErrorLog <%= node[:apache][:log_dir] %>/<%= @params[:name] %>-ssl-error.log
